@@ -18,6 +18,7 @@
   "homepage": "https://github.com/jonesjsc/12-MySQL-Employee-Tracker#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "inquirer": "^8.0.0",
     "mysql": "^2.18.1"
   }
 }
