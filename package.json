@@ -1,0 +1,23 @@
+{
+  "name": "12-mysql-employee-tracker",
+  "version": "1.0.0",
+  "description": "# Unit 12 MySQL Homework: Employee Tracker",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonesjsc/12-MySQL-Employee-Tracker.git"
+  },
+  "author": "jason.e.jones@gmail.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonesjsc/12-MySQL-Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/jonesjsc/12-MySQL-Employee-Tracker#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql": "^2.18.1"
+  }
+}
