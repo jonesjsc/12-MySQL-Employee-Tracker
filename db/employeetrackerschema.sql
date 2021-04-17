@@ -1,14 +1,11 @@
 DROP DATABASE IF EXISTS emp_trackerDB;
 CREATE database emp_trackerDB;
-
-USE emp_trackerDB;
-
+USE emp_trackerdb;
 CREATE TABLE department (
   id INT NOT NULL,
   name VARCHAR(30),
   PRIMARY KEY (id)
 );
-
 CREATE TABLE role (
   id INT NOT NULL,
   title VARCHAR(30) NULL,
@@ -19,7 +16,6 @@ CREATE TABLE role (
     FOREIGN KEY (department_id) 
     REFERENCES department(id)
 );
-
 CREATE TABLE employee (
   id INT NOT NULL,
   first_name VARCHAR(30) NOT NULL,
@@ -34,4 +30,3 @@ CREATE TABLE employee (
 	FOREIGN KEY (manager_id)
     REFERENCES employee(id)
 );
-

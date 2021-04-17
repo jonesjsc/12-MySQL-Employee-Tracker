@@ -1,17 +1,38 @@
-const express = require('express');
-const routes = require('./routes/api/userRoutes');
-const sequelize = require('./config/connection');
+// const express = require("express");
+// const routes = require("./routes/api/userRoutes");
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+const mysql = require("mysql");
+const inquirer = require("inquirer");
+const cTable = require("console.table");
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+require("dotenv").config();
 
-// turn on routes
-app.use(routes);
+// create the connection information for the sql database
+const connection = mysql.createConnection({
+  host: "localhost",
 
-// turn on connection to db and server
-sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => console.log(`Now listening on port ${PORT}`));
+  // Your port; if not 3306
+  port: process.env.DB_PORT,
+
+  // Your username
+  user: process.env.DB_USER,
+
+  // Your password
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
+
+connection.connect((err) => {
+  if (err) throw err;
+  runMain();
+});
+
+// connection.end();
+
+async function runMain() {
+  console.log("in main");
+  connection.query("SELECT * FROM department", (err, results) => await {
+    if (err) throw err;
+    console.table(results, "name");
+  });
+}

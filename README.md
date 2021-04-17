@@ -1,20 +1,17 @@
 # 12-MySQL-Employee-Tracker
+
 Unit 12 MySQL Homework: Employee Tracker
 
 # How to Install and run
 
-* clone the repo
-* npm i mysql inquirer express console.table
-* node start
+- clone the repo
+- npm i mysql inquirer express console.table
+- node start
 
 # Dependencies
 
-* mysql
-* inquirer
-* express
-* console.table
-* env - basic SQL security
-* sequalize
-* mysql2
-* bcrypt
-* sequelize
+- mysql
+- inquirer
+- express
+- console.table
+- env - basic SQL security
