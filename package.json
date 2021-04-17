@@ -17,8 +17,12 @@
   },
   "homepage": "https://github.com/jonesjsc/12-MySQL-Employee-Tracker#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "inquirer": "^8.0.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.6.2"
   }
 }
