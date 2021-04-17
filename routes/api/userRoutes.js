@@ -1,10 +1,56 @@
 const router = require('express').Router();
+
 const User = require('../../models/User');
-const Employee = require('../../models/Employee');
-const Role = require('../../models/Role');
+
 const Department = require('../../models/Department');
+const Role = require('../../models/Role');
+const Employee = require('../../models/Employee');
+
+// establish FK relationships
+
+// Employee.belongsTo(Role, {'foreignKey: 'role_id'});
+
+// Department.belongsTo(Role, {'foreignKey: 'department_id'});
 
 // GET one user
+
+router.post('/seed', (req, res) => {
+  // Multiple rows can be created with `bulkCreate()` and an array
+  // This could also be moved to a separate Node.js script to ensure it only happens once
+  Department.bulkCreate([
+    {
+      id: 1,
+      name: 'Accounting'
+    },
+    {
+      id: 2,
+      name: 'Sales'
+    },
+    {
+      id: 3,
+      name: 'HR'
+    },
+    {
+      id: 4,
+      name: 'Admin'
+    }
+  ]).then(() => {
+    Role.bulkCreate([
+      {
+        id: '1',
+        title: 'Accounts Payable',
+        salary: 127000.00,
+        department_id: 1
+      }])
+  })
+    .then(() => {
+      res.send('Database seeded!');
+    })
+    .catch((err) => {
+      res.json(err);
+    });
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const userData = await User.findByPk(req.params.id);

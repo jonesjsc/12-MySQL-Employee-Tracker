@@ -27,10 +27,14 @@ Role.init(
       type: DataTypes.DECIMAL(10,2),
       allowNull: false,
     },
-    // department_id: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    // },
+    department_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'department',
+        key: 'id',
+      },
+      allowNull: false,
+    },
 
   },
   {

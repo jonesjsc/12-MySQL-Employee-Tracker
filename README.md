@@ -13,4 +13,8 @@ Unit 12 MySQL Homework: Employee Tracker
 * inquirer
 * express
 * console.table
-
+* env - basic SQL security
+* sequalize
+* mysql2
+* bcrypt
+* sequelize
