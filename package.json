@@ -1,28 +1,25 @@
 {
-  "name": "12-mysql-employee-tracker",
+  "name": "12-MySQL-Employee-Tracker",
   "version": "1.0.0",
-  "description": "# Unit 12 MySQL Homework: Employee Tracker",
-  "main": "server.js",
+  "description": "Unit 12 MySQL Homework: Employee Tracker",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jonesjsc/12-MySQL-Employee-Tracker.git"
   },
-  "author": "jason.e.jones@gmail.com",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jonesjsc/12-MySQL-Employee-Tracker/issues"
   },
   "homepage": "https://github.com/jonesjsc/12-MySQL-Employee-Tracker#readme",
   "dependencies": {
-    "bcrypt": "^5.0.1",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
     "inquirer": "^8.0.0",
-    "mysql": "^2.18.1",
-    "mysql2": "^2.2.5",
-    "sequelize": "^6.6.2"
+    "mysql": "^2.18.1"
   }
 }
