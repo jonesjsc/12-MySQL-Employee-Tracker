@@ -7,6 +7,11 @@ const cTable = require("console.table");
 
 require("dotenv").config();
 
+var roleArray = [];
+var deptArray = [];
+var names = [];
+var managerArray = [];
+
 // create the connection information for the sql database
 const connection = mysql.createConnection({
   host: "localhost",
@@ -93,37 +98,24 @@ const viewEmpByAll = () => {
 
 const viewEmpByDept = () => {
   // query the database for a list of all the departments
-  const query = "SELECT * FROM department";
-  connection.query(query, (err, results) => {
-    if (err) throw err;
-    console.table(results);
-    // results.forEach((e) => console.log(e.name));
 
-    inquirer
-      .prompt({
-        name: "choice",
-        type: "list",
-        // dynamically build the choices array by iterating through the select * from department
-        choices() {
-          const choiceArray = [];
-          results.forEach(({ name }) => {
-            choiceArray.push(name);
-          });
-          return choiceArray;
-        },
-        message: "Which Department",
-      })
-      .then((answer) => {
-        connection.query(
-          "SELECT e.id, e.first_name, e.last_name, r.title, d.name 'department', r.salary, concat(m.first_name, ' ',m.last_name) 'Manager' FROM employee e LEFT JOIN employee m ON (e.manager_id = m.id) JOIN role r on e.role_id=r.id JOIN department d on r.department_id=d.id WHERE d.name = ? ORDER BY e.id;",
-          [answer.choice],
-          (err, res) => {
-            console.table(res);
-            start();
-          }
-        );
-      });
-  });
+  inquirer
+    .prompt({
+      name: "choice",
+      type: "list",
+      message: "Which Department?",
+      choices: fetchDepts(),
+    })
+    .then((answer) => {
+      connection.query(
+        "SELECT e.id, e.first_name, e.last_name, r.title, d.name 'department', r.salary, concat(m.first_name, ' ',m.last_name) 'Manager' FROM employee e LEFT JOIN employee m ON (e.manager_id = m.id) JOIN role r on e.role_id=r.id JOIN department d on r.department_id=d.id WHERE d.name = ? ORDER BY e.id;",
+        [answer.choice],
+        (err, res) => {
+          console.table(res);
+          start();
+        }
+      );
+    });
 };
 
 const viewEmpByMgr = () => {
@@ -142,6 +134,7 @@ const viewEmpByMgr = () => {
           results.forEach(({ name }) => {
             choiceArray.push({ name });
           });
+          console.log(choiceArray);
           return choiceArray;
         },
         message: "Which Manager",
@@ -159,19 +152,37 @@ const viewEmpByMgr = () => {
   });
 };
 
+const fetchRoles = () => {
+  const query = "SELECT title from role";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    for (var i = 0; i < results.length; i++) {
+      roleArray.push(results[i].title);
+    }
+  });
+  return roleArray;
+};
+
+async const fetchDepts = () => {
+  const query = "SELECT name from department";
+  await connection.query(query, (err, results) => {
+    if (err) throw err;
+    const names = results.map((dept) => {
+      return dept.name;
+    });
+    console.table(names);
+    console.log("I left this loop with " + names);
+  })
+  console.log("And now names is " + names);
+  console.table(names);
+  return names;
+};
+
 const addEmployee = () => {
   // prompt for info about the item being put up for auction
   const query = "SELECT title from role";
   connection.query(query, (err, results) => {
     if (err) throw err;
-    console.table(results);
-    const roleArray = [];
-    results.forEach(({ title }) => {
-      roleArray.push({ title });
-    });
-    console.table(roleArray);
-    console.log(["one", "two"]);
-    console.log([...roleArray]);
     inquirer
       .prompt([
         {
@@ -185,21 +196,24 @@ const addEmployee = () => {
           message: "What is the employee's last name?",
         },
         {
-          name: "role",
+          name: "title",
           type: "list",
-          choices: [...roleArray],
-          // choices() {
-          //   const choiceArray = [];
-          //   results.forEach(({ title }) => {
-          //     choiceArray.push({ title });
-          //   });
-          //   return choiceArray;
-          // },
           message: "What is the employee's role?",
+          choices: fetchRoles(),
         },
         {
           name: "manager",
-          type: "input",
+          type: "list",
+          choices() {
+            const choiceArray = [];
+            results.forEach(({ title }) => {
+              choiceArray.push({ title });
+            });
+            const titles = choiceArray.map((role) => {
+              return role.title;
+            });
+            return titles;
+          },
           message: "Who is the employee's manager?",
         },
       ])
