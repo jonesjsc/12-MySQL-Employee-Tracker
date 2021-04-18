@@ -160,10 +160,69 @@ const viewEmpByMgr = () => {
 };
 
 const addEmployee = () => {
-  const query = "SELECT * FROM employee";
-  connection.query(query, (err, res) => {
-    res.forEach(({ row }) => console.log(row));
-    start();
+  // prompt for info about the item being put up for auction
+  const query = "SELECT title from role";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    console.table(results);
+    const roleArray = [];
+    results.forEach(({ title }) => {
+      roleArray.push({ title });
+    });
+    console.table(roleArray);
+    console.log(["one", "two"]);
+    console.log([...roleArray]);
+    inquirer
+      .prompt([
+        {
+          name: "first_name",
+          type: "input",
+          message: "What is the employee's first name?",
+        },
+        {
+          name: "last_name",
+          type: "input",
+          message: "What is the employee's last name?",
+        },
+        {
+          name: "role",
+          type: "list",
+          choices: [...roleArray],
+          // choices() {
+          //   const choiceArray = [];
+          //   results.forEach(({ title }) => {
+          //     choiceArray.push({ title });
+          //   });
+          //   return choiceArray;
+          // },
+          message: "What is the employee's role?",
+        },
+        {
+          name: "manager",
+          type: "input",
+          message: "Who is the employee's manager?",
+        },
+      ])
+      .then((answer) => {
+        // when finished prompting, insert a new item into the db with that info
+        console.table(answer);
+        // connection.query(
+        //   "INSERT INTO auctions SET ?",
+        //   // QUESTION: What does the || 0 do?
+        //   {
+        //     item_name: answer.item,
+        //     category: answer.category,
+        //     starting_bid: answer.startingBid || 0,
+        //     highest_bid: answer.startingBid || 0,
+        //   },
+        //   (err) => {
+        //     if (err) throw err;
+        //     console.log("Your auction was created successfully!");
+        //     // re-prompt the user for if they want to bid or post
+        //     start();
+        //   }
+        // );
+      });
   });
 };
 
