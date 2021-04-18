@@ -119,12 +119,13 @@ const viewEmpByDept = () => {
           [answer.choice],
           (err, res) => {
             console.table(res);
+            start();
           }
         );
       });
     // .then(start());
   });
-  start();
+  // start();
 };
 
 // const bidAuction = () => {
