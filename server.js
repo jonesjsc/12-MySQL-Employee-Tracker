@@ -121,10 +121,10 @@ const viewEmpByDept = () => {
             console.table(res);
           }
         );
-      })
-      .then(start());
+      });
+    // .then(start());
   });
-  // start();
+  start();
 };
 
 // const bidAuction = () => {
