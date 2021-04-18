@@ -123,78 +123,39 @@ const viewEmpByDept = () => {
           }
         );
       });
-    // .then(start());
   });
-  // start();
 };
 
-// const bidAuction = () => {
-//   // query the database for all items being auctioned
-//   connection.query("SELECT * FROM auctions", (err, results) => {
-//     if (err) throw err;
-//     // once you have the items, prompt the user for which they'd like to bid on
-//     inquirer
-//       .prompt([
-//         {
-//           name: "choice",
-//           type: "rawlist",
-//           choices() {
-//             const choiceArray = [];
-//             results.forEach(({ item_name }) => {
-//               choiceArray.push(item_name);
-//             });
-//             return choiceArray;
-//           },
-//           message: "What auction would you like to place a bid in?",
-//         },
-//         {
-//           name: "bid",
-//           type: "input",
-//           message: "How much would you like to bid?",
-//         },
-//       ])
-//       .then((answer) => {
-//         // get the information of the chosen item
-//         let chosenItem;
-//         results.forEach((item) => {
-//           if (item.item_name === answer.choice) {
-//             chosenItem = item;
-//           }
-//         });
-
-//         // determine if bid was high enough
-//         if (chosenItem.highest_bid < parseInt(answer.bid)) {
-//           // bid was high enough, so update db, let the user know, and start over
-//           connection.query(
-//             "UPDATE auctions SET ? WHERE ?",
-//             [
-//               {
-//                 highest_bid: answer.bid,
-//               },
-//               {
-//                 id: chosenItem.id,
-//               },
-//             ],
-//             (error) => {
-//               if (error) throw err;
-//               console.log("Bid placed successfully!");
-//               start();
-//             }
-//           );
-//         } else {
-//           // bid wasn't high enough, so apologize and start over
-//           console.log("Your bid was too low. Try again...");
-//           start();
-//         }
-//       });
-//   });
-// };
-
 const viewEmpByMgr = () => {
-  const query = "SELECT * FROM employee";
-  connection.query(query, (err, res) => {
-    res.forEach(({ row }) => console.log(row));
-    start();
+  // query the database for a list of all the departments
+  const query =
+    "SELECT DISTINCT e.id, concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    // console.table(results);
+    inquirer
+      .prompt({
+        name: "choice",
+        type: "list",
+        choices() {
+          const choiceArray = [];
+          results.forEach(({ name }) => {
+            choiceArray.push({ name });
+          });
+          return choiceArray;
+        },
+        message: "Which Manager",
+      })
+      .then((answer) => {
+        connection.query(
+          "SELECT e.id, e.first_name, e.last_name, r.title, d.name 'department', r.salary, concat(m.first_name, ' ',m.last_name) 'Manager' FROM employee e LEFT JOIN employee m ON (e.manager_id = m.id) JOIN role r on e.role_id=r.id JOIN department d on r.department_id=d.id WHERE (SELECT DISTINCT x.id from employee x WHERE concat(x.first_name,' ',x.last_name) = ?) = m.id;",
+          [answer.choice],
+          (err, res) => {
+            console.table(res);
+            start();
+          }
+        );
+      });
   });
 };
 
