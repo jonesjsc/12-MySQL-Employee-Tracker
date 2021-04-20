@@ -3,6 +3,7 @@
 
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+
 const cTable = require("console.table");
 
 require("dotenv").config();
@@ -98,24 +99,29 @@ const viewEmpByAll = () => {
 
 const viewEmpByDept = () => {
   // query the database for a list of all the departments
-
-  inquirer
-    .prompt({
-      name: "choice",
-      type: "list",
-      message: "Which Department?",
-      choices: fetchDepts(),
-    })
-    .then((answer) => {
-      connection.query(
-        "SELECT e.id, e.first_name, e.last_name, r.title, d.name 'department', r.salary, concat(m.first_name, ' ',m.last_name) 'Manager' FROM employee e LEFT JOIN employee m ON (e.manager_id = m.id) JOIN role r on e.role_id=r.id JOIN department d on r.department_id=d.id WHERE d.name = ? ORDER BY e.id;",
-        [answer.choice],
-        (err, res) => {
-          console.table(res);
-          start();
-        }
-      );
-    });
+  const query = "SELECT name from department";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          name: "choice",
+          type: "list",
+          message: "Which Department?",
+          choices: fetchDepts(),
+        },
+      ])
+      .then((answer) => {
+        connection.query(
+          "SELECT e.id, e.first_name, e.last_name, r.title, d.name 'department', r.salary, concat(m.first_name, ' ',m.last_name) 'Manager' FROM employee e LEFT JOIN employee m ON (e.manager_id = m.id) JOIN role r on e.role_id=r.id JOIN department d on r.department_id=d.id WHERE d.name = ? ORDER BY e.id;",
+          [answer.choice],
+          (err, res) => {
+            console.table(res);
+            start();
+          }
+        );
+      });
+  });
 };
 
 const viewEmpByMgr = () => {
@@ -137,6 +143,14 @@ const viewEmpByMgr = () => {
           console.log(choiceArray);
           return choiceArray;
         },
+        // choices() {
+        //   const choiceArray = [];
+        //   results.forEach(({ name }) => {
+        //     choiceArray.push({ name });
+        //   });
+        //   console.log(choiceArray);
+        //   return choiceArray;
+        // },
         message: "Which Manager",
       })
       .then((answer) => {
@@ -160,19 +174,20 @@ const fetchRoles = () => {
       roleArray.push(results[i].title);
     }
   });
+  console.log("roleArray is " + roleArray);
   return roleArray;
 };
 
-async const fetchDepts = () => {
+fetchDepts = () => {
   const query = "SELECT name from department";
-  await connection.query(query, (err, results) => {
+  connection.query(query, (err, results) => {
     if (err) throw err;
     const names = results.map((dept) => {
       return dept.name;
     });
     console.table(names);
     console.log("I left this loop with " + names);
-  })
+  });
   console.log("And now names is " + names);
   console.table(names);
   return names;
