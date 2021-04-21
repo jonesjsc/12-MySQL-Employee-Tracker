@@ -4,6 +4,10 @@ const util = require("util");
 const cTable = require("console.table");
 const express = require("express");
 require("dotenv").config();
+var role_to_add = "";
+var fn_to_add = "";
+var ln_to_add = "";
+var manager_to_add = "";
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -26,22 +30,15 @@ const query = util.promisify(connection.query).bind(connection);
 //   }
 // })();
 
-async function showEmployees() {
+async function setArrays() {
   try {
-    const rows = await query("select * from employee");
-    console.table(rows);
-  } catch (error) {
-    console.error(error);
-  }
-  //   finally {
-  //     connection.end();
-  //   }
-}
-
-async function showRoles() {
-  try {
-    const rows = await query("select * from role");
-    console.table(rows);
+    const roles = await query("select title from role");
+    const managers = await query(
+      "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;"
+    );
+    console.log("loading " + roles + " and " + managers);
+    console.table(roles);
+    console.table(managers);
   } catch (error) {
     console.error(error);
   }
@@ -119,6 +116,8 @@ const start = () => {
       }
     });
 };
+
+setArrays();
 start();
 
 function viewEmpByAll() {
@@ -130,7 +129,7 @@ function viewEmpByAll() {
   });
 }
 
-async function viewEmpByDept() {
+function viewEmpByDept() {
   const query = "SELECT name from department";
   connection.query(query, (err, results) => {
     if (err) throw err;
@@ -198,10 +197,113 @@ const viewEmpByMgr = () => {
   });
 };
 
-async function addEmployee() {
-  await console.log("addEmployee");
-  start();
-}
+const addEmployee = () => {
+  // prompt for info about the item being put up for auction
+  const query = "SELECT title from role;";
+  connection.query(query, (err, results) => {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          name: "first_name",
+          type: "input",
+          message: "What is the employee's first name?",
+        },
+        {
+          name: "last_name",
+          type: "input",
+          message: "What is the employee's last name?",
+        },
+        {
+          name: "title",
+          type: "list",
+          message: "What is the employee's role?",
+          choices() {
+            //     return roles;
+            //   },
+            // choices() {
+            const choiceArray = [];
+            results.forEach(({ title }) => {
+              choiceArray.push({ title });
+            });
+            const titles = choiceArray.map((role) => {
+              return role.title;
+            });
+            return titles;
+          },
+        },
+      ])
+      //         choices() {
+      //           connection.query("SELECT e.id, e.first_name, e.last_name, r.title, d.name 'department', r.salary, concat(m.first_name, ' ',m.last_name) 'Manager' FROM employee e LEFT JOIN employee m ON (e.manager_id = m.id) JOIN role r on e.role_id=r.id JOIN department d on r.department_id=d.id WHERE (SELECT DISTINCT x.id from employee x WHERE concat(x.first_name,' ',x.last_name) = ?) = m.id;",
+      //           [answer.title],
+      //           (err, results) => {
+      //               console.table(results);
+      //             const choiceArray = [];
+      //             results.forEach(({ title }) => {
+      //               choiceArray.push({ title });
+      //             });
+      //             const titles = choiceArray.map((role) => {
+      //               return role.title;
+      //             });
+      //             return titles;
+      //           },
+      //    )}
+      .then((answer) => {
+        fn_to_add = answer.first_name;
+        ln_to_add = answer.last_name;
+        role_to_add = answer.title;
+      })
+      .then((answer) => {
+        const query =
+          "SELECT DISTINCT e.id, concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
+        connection.query(query, (err, results) => {
+          if (err) throw err;
+          console.table(results);
+          inquirer.prompt({
+            name: "manager",
+            type: "list",
+            message: "What is the Managers Name?",
+            choices() {
+              const choiceArray = [];
+              results.forEach(({ name }) => {
+                choiceArray.push({ name });
+              });
+              return choiceArray;
+            },
+          });
+        });
+      })
+      .then((answer) => {
+        console.log("answer is " + answer);
+        console.table(answer);
+        // manager_to_add = answer.name;
+        console.log("first name " + fn_to_add);
+        console.log("last name " + ln_to_add);
+        console.log("role to add " + role_to_add);
+        console.log("manager name " + manager_to_add);
+        // connection.query(
+        //   "INSERT INTO auctions SET ?",
+        //   // QUESTION: What does the || 0 do?
+        //   {
+        //     item_name: answer.item,
+        //     category: answer.category,
+        //     starting_bid: answer.startingBid || 0,
+        //     highest_bid: answer.startingBid || 0,
+        //   },
+        //   (err) => {
+        //     if (err) throw err;
+        //     console.log("Your auction was created successfully!");
+        //     // re-prompt the user for if they want to bid or post
+        //     start();
+        //   }
+        // );
+      });
+  });
+};
+// async function addEmployee() {
+//   await console.log("addEmployee");
+//   start();
+// }
 
 async function removeEmployee() {
   await console.log("removeEmployee");
