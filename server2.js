@@ -225,14 +225,13 @@ const addEmployee = async () => {
       },
       {
         name: "title",
-        type: "rawlist",
+        type: "list",
         message: "What is the employee's role?",
         choices() {
           const choiceArray = [];
           roleData.forEach(({ title }) => {
             choiceArray.push(title);
           });
-          //   console.log(choiceArray);
           return choiceArray;
         },
       },
@@ -263,64 +262,31 @@ const addEmployee = async () => {
       const titleIdRow = await query(query4, where4);
       const mgrIdRow = await query(query5, where5);
 
-      console.log(
-        "here I present to you for your viewing enjoyment titleIdRow and mgrIdRow"
-      );
-
-      console.table(titleIdRow);
-      console.table(mgrIdRow);
-
-      console.log(
-        "but heck if I know how to extract just that lil id from these"
-      );
-
-      // let titleId = "";
+      // this is a titleIdRow amd mgrIdRow are RowDataPacket format.  To convert to usable data we need to do this:
       const titleId = Object.values(JSON.parse(JSON.stringify(titleIdRow)));
-      // const titleId = JSON.parse(JSON.stringify(titleIdRow));
-      console.log("***console log of titleId.id***");
-      // console.log(titleId.id);
+      const mgrId = Object.values(JSON.parse(JSON.stringify(mgrIdRow)));
+      // these returned objects are arrays - so we're just after the [0].id in them
 
-      console.log("***console log of titleIdRow***");
-      // console.log(titleIdRow);
-
-      console.log("***console log of titleIdRow.id***");
-      // console.log(titleIdRow.id);
-
-      console.log("***console TABLE of titleId***");
-      console.log(titleId);
       console.log(titleId[0].id);
+      console.log(mgrId[0].id);
 
-      console.log("***console log of titleId.id***");
-      // console.log(titleId.id);
-
-      console.log("***console log of {titleId}***");
-      // console.log(titleId);
-
-      console.log("the employee id of " + answer.manager + " is " + titleId);
-
-      //   // manager_to_add = answer.name;
-      //   console.log("first name " + fn_to_add);
-      //   console.log("last name " + ln_to_add);
-      //   console.log("role to add " + role_to_add);
-      //   console.log("manager name " + manager_to_add);
-      //   // connection.query(
-      //   //   "INSERT INTO auctions SET ?",
-      //   //   // QUESTION: What does the || 0 do?
-      //   //   {
-      //   //     item_name: answer.item,
-      //   //     category: answer.category,
-      //   //     starting_bid: answer.startingBid || 0,
-      //   //     highest_bid: answer.startingBid || 0,
-      //   //   },
-      //   //   (err) => {
-      //   //     if (err) throw err;
-      //   //     console.log("Your auction was created successfully!");
-      //   //     // re-prompt the user for if they want to bid or post
-      //   //     start();
-      //   //   }
-      //   // );
-      // });
-      // });
+        connection.query(
+          "INSERT INTO employee SET ?",
+          {
+            first_name: answer.first_name,
+            last_name: answer.last_name,
+            role_id: answer.titleId[0].id,
+            manager_id: answer.mgrId[0].id,
+          },
+          (err) => {
+            if (err) throw err;
+            console.log(answer.first_name+" "+answer.last_name+" with role_id of "+answer.titleId[0].id+" and mgr id of "+answer.mgrId[0].id;
+            // re-prompt the user for if they want to bid or post
+            start();
+          }
+        );
+      });
+      });
     });
 };
 
