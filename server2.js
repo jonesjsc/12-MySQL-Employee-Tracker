@@ -117,7 +117,7 @@ const start = () => {
     });
 };
 
-setArrays();
+// setArrays();
 start();
 
 function viewEmpByAll() {
@@ -201,12 +201,12 @@ const addEmployee = async () => {
   // prompt for info about the item being put up for auction
   const query2 = "SELECT title from role;";
   const query3 =
-    "SELECT DISTINCT e.id, concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
+    "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
   const roleData = await query(query2);
   console.table(roleData);
-  console.log(typeof roleData);
-  console.log("xoxoxo");
-  console.log("row 2 " + roleData[2].title);
+  // console.log(typeof roleData);
+  // console.log("xoxoxo");
+  // console.log("row 2 " + roleData[2].title);
 
   const managerData = await query(query3);
   console.table(managerData);
@@ -231,9 +231,28 @@ const addEmployee = async () => {
         roleData.forEach(({ title }) => {
           choiceArray.push({ title });
         });
+        //   console.log(choiceArray);
         return choiceArray;
       },
-
+      // choices: roleData,
+      // choices() {
+      //   const choiceArray = [];
+      //   roleData.forEach(({ name }) => {
+      //     choiceArray.push({ name });
+      //   });
+      //   // console.log("this is a console.table of " + choiceArray);
+      //   return choiceArray;
+      // },
+    },
+    // choices: roleData,
+    // choices() {
+    //   // const choiceArray = [];
+    //   // roleData.forEach(({ title }) => {
+    //   //   choiceArray.push({ title });
+    //   // });
+    //   return roleData;
+    // },
+    {
       name: "manager",
       type: "list",
       message: "Who is the Manager?",
