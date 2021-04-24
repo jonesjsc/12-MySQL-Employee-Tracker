@@ -263,24 +263,38 @@ const addEmployee = async () => {
       const titleIdRow = await query(query4, where4);
       const mgrIdRow = await query(query5, where5);
 
+      console.log(
+        "here I present to you for your viewing enjoyment titleIdRow and mgrIdRow"
+      );
+
       console.table(titleIdRow);
       console.table(mgrIdRow);
+
+      console.log(
+        "but heck if I know how to extract just that lil id from these"
+      );
+
       // let titleId = "";
       const titleId = Object.values(JSON.parse(JSON.stringify(titleIdRow)));
       // const titleId = JSON.parse(JSON.stringify(titleIdRow));
       console.log("***console log of titleId.id***");
-      console.log(titleId.id);
+      // console.log(titleId.id);
+
       console.log("***console log of titleIdRow***");
-      console.log(titleIdRow);
+      // console.log(titleIdRow);
+
       console.log("***console log of titleIdRow.id***");
-      console.log(titleIdRow.id);
+      // console.log(titleIdRow.id);
 
       console.log("***console TABLE of titleId***");
-      console.table(titleId);
+      console.log(titleId);
+      console.log(titleId[0].id);
+
       console.log("***console log of titleId.id***");
-      console.log(titleId.id);
+      // console.log(titleId.id);
+
       console.log("***console log of {titleId}***");
-      console.log({ titleId });
+      // console.log(titleId);
 
       console.log("the employee id of " + answer.manager + " is " + titleId);
 
