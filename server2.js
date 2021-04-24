@@ -202,8 +202,13 @@ const addEmployee = async () => {
   const query2 = "SELECT title from role;";
   const query3 =
     "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
-  const roleData = await query(query2);
+  const roleDataRows = await query(query2);
+  const roleData = Object.values(JSON.parse(JSON.stringify(roleDataRows)));
   console.table(roleData);
+  roleDataRows.forEach((element) => console.log(element));
+  roleData.forEach((element) => console.log(element));
+  // const result = Object.values(JSON.parse(JSON.stringify(rows)));
+
   // console.log(typeof roleData);
   // console.log("xoxoxo");
   // console.log("row 2 " + roleData[2].title);
