@@ -205,13 +205,13 @@ const addEmployee = async () => {
   const roleDataRows = await query(query2);
   const roleData = Object.values(JSON.parse(JSON.stringify(roleDataRows)));
   console.table(roleData);
+  console.log("***roleDataRows***");
   roleDataRows.forEach((element) => console.log(element));
+  console.log("***roleData***");
   roleData.forEach((element) => console.log(element));
-  // const result = Object.values(JSON.parse(JSON.stringify(rows)));
+  // const choiceArray = [];
 
-  // console.log(typeof roleData);
-  // console.log("xoxoxo");
-  // console.log("row 2 " + roleData[2].title);
+  // const result = Object.values(JSON.parse(JSON.stringify(rows)));
 
   const managerData = await query(query3);
   console.table(managerData);
@@ -229,25 +229,16 @@ const addEmployee = async () => {
     },
     {
       name: "title",
-      type: "list",
+      type: "rawlist",
       message: "What is the employee's role?",
       choices() {
-        const choiceArray = [];
+        const roleArray = [];
         roleData.forEach(({ title }) => {
-          choiceArray.push({ title });
+          roleArray.push({ title });
         });
         //   console.log(choiceArray);
-        return choiceArray;
+        return roleArray;
       },
-      // choices: roleData,
-      // choices() {
-      //   const choiceArray = [];
-      //   roleData.forEach(({ name }) => {
-      //     choiceArray.push({ name });
-      //   });
-      //   // console.log("this is a console.table of " + choiceArray);
-      //   return choiceArray;
-      // },
     },
     // choices: roleData,
     // choices() {
