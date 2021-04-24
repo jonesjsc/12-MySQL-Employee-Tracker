@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+const confirm = require("inquirer-confirm");
 const util = require("util");
 const cTable = require("console.table");
 // const express = require("express");
@@ -8,6 +9,14 @@ var role_to_add = "";
 var fn_to_add = "";
 var ln_to_add = "";
 var manager_to_add = "";
+
+function confirmed() {
+  console.log("confirmed");
+}
+
+function cancelled() {
+  console.log("CANCELLED");
+}
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -276,7 +285,42 @@ const addEmployee = async () => {
 };
 
 async function removeEmployee() {
-  await console.log("removeEmployee");
+  const query6 =
+    "SELECT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e ORDER BY name";
+  const employeeRows = await query(query6);
+  const employees = Object.values(JSON.parse(JSON.stringify(employeeRows)));
+
+  inquirerPrompt = await inquirer
+    .prompt([
+      {
+        name: "name",
+        type: "list",
+        message: "Which employee are we removing?",
+        choices() {
+          const choiceArray = [];
+          employees.forEach(({ name }) => {
+            choiceArray.push(name);
+          });
+          return choiceArray;
+        },
+      },
+      {
+        name: "confirm",
+        type: "list",
+        message: (answers) => `Confirm DELETE of ${answers.name}`,
+        choices: ["No", "Yes"],
+      },
+    ])
+    .then(async (answer) => {
+      if (answer.confirm == "Yes") {
+        query7 =
+          "DELETE FROM employee e WHERE concat(e.first_name, ' ',e.last_name) = ?;";
+        where7 = answer.name;
+        const employeeRows = await query(query7, where7);
+      }
+    });
+
+  console.log("removeEmployee");
   start();
 }
 
