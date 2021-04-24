@@ -19,17 +19,6 @@ const connection = mysql.createConnection({
 
 const query = util.promisify(connection.query).bind(connection);
 
-// (async () => {
-//   try {
-//     const rows = await query("select * from employee");
-//     console.table(rows);
-//   } catch (error) {
-//     console.error(error);
-//   } finally {
-//     connection.end();
-//   }
-// })();
-
 async function setArrays() {
   try {
     const roles = await query("select title from role");
@@ -144,7 +133,6 @@ function viewEmpByDept() {
             results.forEach(({ name }) => {
               choiceArray.push({ name });
             });
-            // console.log(choiceArray);
             return choiceArray;
           },
         },
@@ -179,7 +167,6 @@ const viewEmpByMgr = () => {
           results.forEach(({ name }) => {
             choiceArray.push({ name });
           });
-          //   console.log(choiceArray);
           return choiceArray;
         },
         message: "Which Manager",
@@ -208,9 +195,7 @@ const addEmployee = async () => {
   const mgrData = Object.values(JSON.parse(JSON.stringify(mgrDataRows)));
 
   const managerData = await query(query3);
-  console.table(managerData);
 
-  // const inquirerPrompt = await inquirer.prompt([
   inquirerPrompt = await inquirer
     .prompt([
       {
@@ -249,10 +234,6 @@ const addEmployee = async () => {
       },
     ])
     .then(async (answer) => {
-      console.log(answer.first_name);
-      console.log(answer.last_name);
-      console.log(answer.title);
-      console.log(answer.manager);
       const query4 = "SELECT id FROM role WHERE title = ?";
       const where4 = [answer.title];
       const query5 =
@@ -267,33 +248,32 @@ const addEmployee = async () => {
       const mgrId = Object.values(JSON.parse(JSON.stringify(mgrIdRow)));
       // these returned objects are arrays - so we're just after the [0].id in them
 
-      console.log(titleId[0].id);
-      console.log(mgrId[0].id);
-
-        connection.query(
-          "INSERT INTO employee SET ?",
-          {
-            first_name: answer.first_name,
-            last_name: answer.last_name,
-            role_id: answer.titleId[0].id,
-            manager_id: answer.mgrId[0].id,
-          },
-          (err) => {
-            if (err) throw err;
-            console.log(answer.first_name+" "+answer.last_name+" with role_id of "+answer.titleId[0].id+" and mgr id of "+answer.mgrId[0].id;
-            // re-prompt the user for if they want to bid or post
-            start();
-          }
-        );
-      });
-      });
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: answer.first_name,
+          last_name: answer.last_name,
+          role_id: titleId[0].id,
+          manager_id: mgrId[0].id,
+        },
+        (err) => {
+          if (err) throw err;
+          console.log(
+            answer.first_name +
+              " " +
+              answer.last_name +
+              " SUCCESSFULLY ADDED  (role_id=" +
+              titleId[0].id +
+              " manager_id=" +
+              mgrId[0].id +
+              ")"
+          );
+          // re-prompt the user for next action
+          start();
+        }
+      );
     });
 };
-
-// async function addEmployee() {
-//   await console.log("addEmployee");
-//   start();
-// }
 
 async function removeEmployee() {
   await console.log("removeEmployee");
