@@ -15,10 +15,6 @@ const connection = mysql.createConnection({
 
 const query = util.promisify(connection.query).bind(connection);
 
-// ******* ENTRY POINT
-
-start();
-
 const start = () => {
   inquirer
     .prompt({
@@ -30,9 +26,11 @@ const start = () => {
         "View All Employees By Department",
         "View All Employees By Manager",
         "Add Employee",
-        "Remove Employee",
+        "Add Department",
+        "Add Role",
         "Update Employee Role",
         "Update Employee Manager",
+        "Remove Employee",
         "Quit",
       ],
     })
@@ -64,6 +62,14 @@ const start = () => {
 
         case "Update Employee Manager":
           updateEmpByMgr();
+          break;
+
+        case "Add Department":
+          addDepartment();
+          break;
+
+        case "Add Role":
+          addRole();
           break;
 
         case "Quit":
@@ -147,6 +153,95 @@ const viewEmpByMgr = () => {
         );
       });
   });
+};
+
+const addRole = async () => {
+  const query18 = "SELECT name FROM department";
+  const departmentRows = await query(query18);
+  const departments = Object.values(JSON.parse(JSON.stringify(departmentRows)));
+
+  inquirerPrompt = await inquirer
+    .prompt([
+      {
+        name: "roleToAdd",
+        type: "input",
+        message: "What role are we adding?",
+      },
+      {
+        name: "roleToAddSalary",
+        type: "input",
+        message: "Whats the Salary for this role?",
+      },
+      {
+        name: "roleToAddDept",
+        type: "list",
+        message: "Which Department does this role belong to?",
+        choices() {
+          const choiceArray = [];
+          departments.forEach(({ name }) => {
+            choiceArray.push({ name });
+          });
+          return choiceArray;
+        },
+      },
+      {
+        name: "confirm",
+        type: "list",
+        message: (answers) =>
+          `Confirm create role ${answers.roleToAdd} with Salary ${answers.roleToAddSalary} under ${answers.roleToAddDept}?`,
+        choices: ["No", "Yes"],
+      },
+    ])
+    .then(async (answer) => {
+      if (answer.confirm == "Yes") {
+        // you say you want to do this, but first let's see if the role you want to add already exists
+        const query16 = "SELECT title from role;";
+        const roleDataRows = await query(query16);
+        const roleData = Object.values(
+          JSON.parse(JSON.stringify(roleDataRows))
+        );
+        //
+        // I really only want to add a role if the role name is unique
+        //
+        var found = Object.keys(roleData).filter(function (key) {
+          return roleData[key].title === answer.roleToAdd;
+        });
+
+        if (found.length) {
+          console.log(
+            "The role you are adding already exists - No Action taken"
+          );
+        } else {
+          console.log(
+            `${answer.roleToAdd} ${answer.roleToAddSalary} ${answer.roleToAddDept}`
+          );
+          // we gotta get the id for the DEPARTMENT you want to add this role to
+          const query17 = "SELECT id from department WHERE name = ?;";
+          const where17 = [answer.roleToAddDept];
+          const deptIdRows = await query(query17, where17);
+          const deptId = Object.values(JSON.parse(JSON.stringify(deptIdRows)));
+
+          console.log("the dept id is " + deptId[0].id);
+
+          connection.query(
+            "INSERT INTO role SET ?",
+            {
+              title: answer.roleToAdd,
+              salary: answer.roleToAddSalary,
+              department_id: deptId[0].id,
+            },
+            (err) => {
+              if (err) throw err;
+              console.log(
+                `SUCCESSFULLY ADDED ROLE ${answer.roleToAdd} - salary:${answer.roleToAddSalary} with deptid: ${answer.roleToAddDept}`
+              );
+
+              start();
+            }
+          ); // ends the connection.query INSERT
+        } // ends the else block
+      } // ends the block where the user said YES to confirm
+    }); // ends the async function call
 };
 
 const addEmployee = async () => {
@@ -363,9 +458,6 @@ async function updateEmpByMgr() {
     JSON.parse(JSON.stringify(allManagersRows))
   );
 
-  console.table(allEmployees);
-  console.table(allManagers);
-
   inquirerPrompt = await inquirer
     .prompt([
       {
@@ -421,3 +513,7 @@ async function updateEmpByMgr() {
 
   start();
 }
+
+// ******* ENTRY POINT
+
+start();

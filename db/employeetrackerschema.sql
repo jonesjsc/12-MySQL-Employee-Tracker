@@ -2,12 +2,12 @@ DROP DATABASE IF EXISTS emp_trackerDB;
 CREATE database emp_trackerDB;
 USE emp_trackerdb;
 CREATE TABLE department (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   name VARCHAR(30),
   PRIMARY KEY (id)
 );
 CREATE TABLE role (
-  id INT NOT NULL,
+  id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(30) NULL,
   salary DECIMAL(10,2) NULL,
   department_id INT NOT NULL,
