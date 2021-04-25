@@ -73,6 +73,7 @@ const start = () => {
           break;
 
         case "Quit":
+          connection.end();
           break;
 
         default:
@@ -570,12 +571,4 @@ async function updateEmpByMgr() {
 
 // ******* ENTRY POINT
 
-async function main() {
-  console.log("***STARTING***");
-  const status = await start();
-  console.log("***ENDING***");
-  // connection.end();
-}
-
-main();
-console.log("***REALLY ENDING***");
+start();
