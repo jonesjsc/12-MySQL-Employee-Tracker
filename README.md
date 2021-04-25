@@ -32,9 +32,10 @@ The primary objective of this exercise was to fmailarize yourself with MYSQL in 
 
 # Links
 
-| Description | Link                                                  |
-| ----------- | ----------------------------------------------------- |
-| github repo | https://github.com/jonesjsc/12-MySQL-Employee-Tracker |
+| Description                                 | Link                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------ |
+| github repo                                 | https://github.com/jonesjsc/12-MySQL-Employee-Tracker              |
+| I think the commits are funny but it's late | https://github.com/jonesjsc/12-MySQL-Employee-Tracker/commits/main |
 
 ## Screenshots
 
