@@ -1,6 +1,5 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-const confirm = require("inquirer-confirm");
 const util = require("util");
 const cTable = require("console.table");
 require("dotenv").config();
@@ -417,7 +416,17 @@ async function removeEmployee() {
         query7 =
           "DELETE FROM employee e WHERE concat(e.first_name, ' ',e.last_name) = ?;";
         where7 = answer.name;
-        const employeeRows = await query(query7, where7);
+        try {
+          const employeeRows = await query(query7, where7);
+        } catch (e) {
+          if (e.errno == 1451) {
+            console.log(
+              `We failed on a Forgien Key Constraint - probably because ${answer.name} is a manager.  DELETE failed.`
+            );
+          } else {
+            console.log(e);
+          }
+        }
       }
     });
 
