@@ -213,16 +213,11 @@ const addRole = async () => {
             "The role you are adding already exists - No Action taken"
           );
         } else {
-          console.log(
-            `${answer.roleToAdd} ${answer.roleToAddSalary} ${answer.roleToAddDept}`
-          );
           // we gotta get the id for the DEPARTMENT you want to add this role to
           const query17 = "SELECT id from department WHERE name = ?;";
           const where17 = [answer.roleToAddDept];
           const deptIdRows = await query(query17, where17);
           const deptId = Object.values(JSON.parse(JSON.stringify(deptIdRows)));
-
-          console.log("the dept id is " + deptId[0].id);
 
           connection.query(
             "INSERT INTO role SET ?",
@@ -237,10 +232,11 @@ const addRole = async () => {
                 `SUCCESSFULLY ADDED ROLE ${answer.roleToAdd} - salary:${answer.roleToAddSalary} with deptid: ${answer.roleToAddDept}`
               );
 
-              start();
+              // start();
             }
           ); // ends the connection.query INSERT
         } // ends the else block
+        start();
       } // ends the block where the user said YES to confirm
     }); // ends the async function call
 };
@@ -280,7 +276,6 @@ const addDepartment = async () => {
             "The department you are trying to add already exists - No Action taken"
           );
         } else {
-          console.log(`Lets do this ${answer.deptToAdd}`);
           // we gotta get the id for the DEPARTMENT you want to add this role to
 
           connection.query(
@@ -291,11 +286,10 @@ const addDepartment = async () => {
             (err) => {
               if (err) throw err;
               console.log(`SUCCESSFULLY ADDED DEPARTMENT ${answer.deptToAdd}`);
-
-              start();
             }
           ); // ends the connection.query INSERT
         } // ends the else block
+        start();
       } // ends the block where the user said YES to confirm
     }); // ends the async function call
 };
@@ -303,7 +297,7 @@ const addDepartment = async () => {
 const addEmployee = async () => {
   const query2 = "SELECT title from role;";
   const query3 =
-    "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
+    "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL ORDER BY name;";
   const roleDataRows = await query(query2);
   const roleData = Object.values(JSON.parse(JSON.stringify(roleDataRows)));
   const mgrDataRows = await query(query3);
