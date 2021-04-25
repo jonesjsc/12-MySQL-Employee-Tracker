@@ -320,12 +320,76 @@ async function removeEmployee() {
       }
     });
 
-  console.log("removeEmployee");
   start();
 }
 
 async function updateEmpByRole() {
-  await console.log("updateEmpByRole");
+  const query8 =
+    "SELECT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e ORDER BY name";
+  const query9 = "select id, title from role";
+
+  const allEmployeesRows = await query(query8);
+  const allEmployees = Object.values(
+    JSON.parse(JSON.stringify(allEmployeesRows))
+  );
+
+  const allRolesRows = await query(query9);
+  const allRoles = Object.values(JSON.parse(JSON.stringify(allRolesRows)));
+
+  inquirerPrompt = await inquirer
+    .prompt([
+      {
+        name: "name",
+        type: "list",
+        message: "Which employee are changing the Role for?",
+        choices() {
+          const choiceArray = [];
+          allEmployees.forEach(({ name }) => {
+            choiceArray.push(name);
+          });
+          return choiceArray;
+        },
+      },
+      {
+        name: "role",
+        type: "list",
+        message: "What role will the Employee have now?",
+        choices() {
+          const choiceArray = [];
+          allRoles.forEach(({ title }) => {
+            choiceArray.push(title);
+          });
+          return choiceArray;
+        },
+      },
+      {
+        name: "confirm",
+        type: "list",
+        message: (answers) =>
+          `Confirm - for ${answers.name} set role to  ${answers.role}`,
+        choices: ["No", "Yes"],
+      },
+    ])
+    .then(async (answer) => {
+      if (answer.confirm == "Yes") {
+        console.log("lets update this shizzle");
+        console.table(answer);
+        const query10 = "SELECT id FROM role WHERE title = ?";
+        const where10 = [answer.role];
+        const roleIdRow = await query(query10, where10);
+        const roleId = Object.values(JSON.parse(JSON.stringify(roleIdRow)));
+        const query11 =
+          "UPDATE employee SET role_id = ? WHERE concat(e.first_name, ' ',e.last_name) = ?";
+        const where11 = [{roleId[0].id}, answer.name];
+        const updateEmp = await query(query11, where11);
+
+        // query10 =
+        //   "UPDATE FROM employee e WHERE concat(e.first_name, ' ',e.last_name) = ?;";
+        // where7 = answer.name;
+        // const employeeRows = await query(query7, where7);
+      }
+    });
+
   start();
 }
 
