@@ -244,6 +244,61 @@ const addRole = async () => {
     }); // ends the async function call
 };
 
+const addDepartment = async () => {
+  inquirerPrompt = await inquirer
+    .prompt([
+      {
+        name: "deptToAdd",
+        type: "input",
+        message: "What Department are we creating?",
+      },
+      {
+        name: "confirm",
+        type: "list",
+        message: (answers) => `Confirm create department ${answers.deptToAdd}?`,
+        choices: ["No", "Yes"],
+      },
+    ])
+    .then(async (answer) => {
+      if (answer.confirm == "Yes") {
+        // you say you want to do this, but first let's see if the department you want to add already exists
+        const query19 = "SELECT name FROM department";
+        const departmentRows = await query(query19);
+        const departments = Object.values(
+          JSON.parse(JSON.stringify(departmentRows))
+        );
+        //
+        // I really only want to add this department iif the department name is unique
+        //
+        var found = Object.keys(departments).filter(function (key) {
+          return departments[key].name === answer.deptToAdd;
+        });
+
+        if (found.length) {
+          console.log(
+            "The department you are trying to add already exists - No Action taken"
+          );
+        } else {
+          console.log(`Lets do this ${answer.deptToAdd}`);
+          // we gotta get the id for the DEPARTMENT you want to add this role to
+
+          connection.query(
+            "INSERT INTO department SET ?",
+            {
+              name: answer.deptToAdd,
+            },
+            (err) => {
+              if (err) throw err;
+              console.log(`SUCCESSFULLY ADDED DEPARTMENT ${answer.deptToAdd}`);
+
+              start();
+            }
+          ); // ends the connection.query INSERT
+        } // ends the else block
+      } // ends the block where the user said YES to confirm
+    }); // ends the async function call
+};
+
 const addEmployee = async () => {
   const query2 = "SELECT title from role;";
   const query3 =
@@ -329,7 +384,6 @@ const addEmployee = async () => {
               mgrId[0].id +
               ")"
           );
-          // re-prompt the user for next action
           start();
         }
       );
@@ -516,4 +570,12 @@ async function updateEmpByMgr() {
 
 // ******* ENTRY POINT
 
-start();
+async function main() {
+  console.log("***STARTING***");
+  const status = await start();
+  console.log("***ENDING***");
+  // connection.end();
+}
+
+main();
+console.log("***REALLY ENDING***");
