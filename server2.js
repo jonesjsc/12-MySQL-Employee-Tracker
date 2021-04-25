@@ -32,7 +32,7 @@ async function setArrays() {
   try {
     const roles = await query("select title from role");
     const managers = await query(
-      "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;"
+      "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL ORDER BY NAME;"
     );
     console.log("loading " + roles + " and " + managers);
     console.table(roles);
@@ -163,7 +163,7 @@ function viewEmpByDept() {
 const viewEmpByMgr = () => {
   // query the database for a list of all the departments
   const query =
-    "SELECT DISTINCT e.id, concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
+    "SELECT DISTINCT e.id, concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL ORDER BY NAME;";
   connection.query(query, (err, results) => {
     if (err) throw err;
     // console.table(results);
@@ -372,8 +372,6 @@ async function updateEmpByRole() {
     ])
     .then(async (answer) => {
       if (answer.confirm == "Yes") {
-        console.log("lets update this shizzle");
-        console.table(answer);
         const query10 = "SELECT id FROM role WHERE title = ?";
         const where10 = [answer.role];
         const roleIdRow = await query(query10, where10);
@@ -382,11 +380,9 @@ async function updateEmpByRole() {
           "UPDATE employee e SET role_id = ? WHERE concat(e.first_name, ' ',e.last_name) = ?";
         const where11 = [roleId[0].id, answer.name];
         const updateEmp = await query(query11, where11);
-
-        // query10 =
-        //   "UPDATE FROM employee e WHERE concat(e.first_name, ' ',e.last_name) = ?;";
-        // where7 = answer.name;
-        // const employeeRows = await query(query7, where7);
+        console.log(
+          `${answer.name} has had role_id set to ${answer.role} (role_id ${roleId[0].id})`
+        );
       }
     });
 
@@ -394,6 +390,77 @@ async function updateEmpByRole() {
 }
 
 async function updateEmpByMgr() {
-  await console.log("updateEmpByMgr");
+  const query12 =
+    "SELECT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e ORDER BY name;";
+
+  const allEmployeesRows = await query(query12);
+  const allEmployees = Object.values(
+    JSON.parse(JSON.stringify(allEmployeesRows))
+  );
+
+  const query13 =
+    "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL ORDER BY name;";
+
+  const allManagersRows = await query(query13);
+  const allManagers = Object.values(
+    JSON.parse(JSON.stringify(allManagersRows))
+  );
+
+  console.table(allEmployees);
+  console.table(allManagers);
+
+  inquirerPrompt = await inquirer
+    .prompt([
+      {
+        name: "name",
+        type: "list",
+        message: "Which employee are changing the Role for?",
+        choices() {
+          const choiceArray = [];
+          allEmployees.forEach(({ name }) => {
+            choiceArray.push(name);
+          });
+          return choiceArray;
+        },
+      },
+      {
+        name: "manager",
+        type: "list",
+        message: "Who is the new Manager??",
+        choices() {
+          const choiceArray = [];
+          allManagers.forEach(({ name }) => {
+            choiceArray.push(name);
+          });
+          return choiceArray;
+        },
+      },
+      {
+        name: "confirm",
+        type: "list",
+        message: (answers) =>
+          `Confirm - for ${answers.name} set manager to ${answers.manager}`,
+        choices: ["No", "Yes"],
+      },
+    ])
+    .then(async (answer) => {
+      if (answer.confirm == "Yes") {
+        const query14 =
+          "SELECT id FROM employee e WHERE concat(e.first_name, ' ',e.last_name) = ?";
+        const where14 = [answer.manager];
+        const managerIdRow = await query(query14, where14);
+        const managerId = Object.values(
+          JSON.parse(JSON.stringify(managerIdRow))
+        );
+        const query15 =
+          "UPDATE employee e SET manager_id = ? WHERE concat(e.first_name, ' ',e.last_name) = ?";
+        const where15 = [managerId[0].id, answer.name];
+        const updateEmp = await query(query15, where15);
+        console.log(
+          `${answer.name} has had manager_id set to ${answer.manager} (role_id ${managerId[0].id})`
+        );
+      }
+    });
+
   start();
 }
