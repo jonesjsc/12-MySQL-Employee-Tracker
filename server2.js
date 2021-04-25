@@ -379,8 +379,8 @@ async function updateEmpByRole() {
         const roleIdRow = await query(query10, where10);
         const roleId = Object.values(JSON.parse(JSON.stringify(roleIdRow)));
         const query11 =
-          "UPDATE employee SET role_id = ? WHERE concat(e.first_name, ' ',e.last_name) = ?";
-        const where11 = [{roleId[0].id}, answer.name];
+          "UPDATE employee e SET role_id = ? WHERE concat(e.first_name, ' ',e.last_name) = ?";
+        const where11 = [roleId[0].id, answer.name];
         const updateEmp = await query(query11, where11);
 
         // query10 =
