@@ -3,20 +3,7 @@ const inquirer = require("inquirer");
 const confirm = require("inquirer-confirm");
 const util = require("util");
 const cTable = require("console.table");
-// const express = require("express");
 require("dotenv").config();
-var role_to_add = "";
-var fn_to_add = "";
-var ln_to_add = "";
-var manager_to_add = "";
-
-function confirmed() {
-  console.log("confirmed");
-}
-
-function cancelled() {
-  console.log("CANCELLED");
-}
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -28,45 +15,15 @@ const connection = mysql.createConnection({
 
 const query = util.promisify(connection.query).bind(connection);
 
-async function setArrays() {
-  try {
-    const roles = await query("select title from role");
-    const managers = await query(
-      "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL ORDER BY NAME;"
-    );
-    console.log("loading " + roles + " and " + managers);
-    console.table(roles);
-    console.table(managers);
-  } catch (error) {
-    console.error(error);
-  }
-  //   finally {
-  //     connection.end();
-  //   }
-}
+// ******* ENTRY POINT
 
-// showEmployees();
-// console.log("after Employees");
-// showRoles();
-
-// async function start() {
-//   try {
-//     await showEmployees();
-//     await console.log("i bet this wont work");
-//     await showRoles();
-//     await console.log("look at me now");
-//   } catch (error) {
-//     console.error(error);
-//   } finally {
-//     connection.end();
-//   }
-// }
+start();
 
 const start = () => {
   inquirer
     .prompt({
       name: "action",
-      type: "rawlist",
+      type: "list",
       message: "What would you like to do?",
       choices: [
         "View All Employees",
@@ -76,7 +33,7 @@ const start = () => {
         "Remove Employee",
         "Update Employee Role",
         "Update Employee Manager",
-        "Exit",
+        "Quit",
       ],
     })
     .then((answer) => {
@@ -109,7 +66,7 @@ const start = () => {
           updateEmpByMgr();
           break;
 
-        case "Exit":
+        case "Quit":
           break;
 
         default:
@@ -118,9 +75,6 @@ const start = () => {
       }
     });
 };
-
-// setArrays();
-start();
 
 function viewEmpByAll() {
   const query =
@@ -161,16 +115,14 @@ function viewEmpByDept() {
         );
       });
   });
-  //   start();
 }
 
 const viewEmpByMgr = () => {
-  // query the database for a list of all the departments
   const query =
     "SELECT DISTINCT e.id, concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL ORDER BY NAME;";
   connection.query(query, (err, results) => {
     if (err) throw err;
-    // console.table(results);
+
     inquirer
       .prompt({
         name: "choice",
@@ -198,7 +150,6 @@ const viewEmpByMgr = () => {
 };
 
 const addEmployee = async () => {
-  // prompt for info about the item being put up for auction
   const query2 = "SELECT title from role;";
   const query3 =
     "SELECT DISTINCT concat(e.first_name, ' ',e.last_name) 'name' FROM employee e JOIN employee m ON (m.manager_id = e.id) WHERE m.manager_id IS NOT NULL;";
@@ -257,8 +208,10 @@ const addEmployee = async () => {
       const mgrIdRow = await query(query5, where5);
 
       // this is a titleIdRow amd mgrIdRow are RowDataPacket format.  To convert to usable data we need to do this:
+
       const titleId = Object.values(JSON.parse(JSON.stringify(titleIdRow)));
       const mgrId = Object.values(JSON.parse(JSON.stringify(mgrIdRow)));
+
       // these returned objects are arrays - so we're just after the [0].id in them
 
       connection.query(
